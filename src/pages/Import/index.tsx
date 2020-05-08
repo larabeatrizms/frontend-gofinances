@@ -20,22 +20,42 @@ interface FileProps {
 
 const Import: React.FC = () => {
   const [uploadedFiles, setUploadedFiles] = useState<FileProps[]>([]);
+  const [errorMessage, setErrorMessage] = useState('');
   const history = useHistory();
 
   async function handleUpload(): Promise<void> {
-    // const data = new FormData();
-
     // TODO
+    const data = new FormData();
+
+    if (!uploadedFiles[0]) {
+      setErrorMessage('Deve-se informar pelo menos um arquivo formato CSV');
+      return;
+    }
+
+    const file = uploadedFiles[0];
+
+    data.append('file', file.file, file.name);
+    setErrorMessage('');
 
     try {
-      // await api.post('/transactions/import', data);
+      await api.post('/transactions/import', data);
+
+      history.push('/');
     } catch (err) {
-      // console.log(err.response.error);
+      console.log(err.response.error);
     }
   }
 
   function submitFile(files: File[]): void {
     // TODO
+
+    const importedFiles = files.map(file => ({
+      file,
+      name: file.name,
+      readableSize: filesize(file.size),
+    }));
+
+    setUploadedFiles(importedFiles);
   }
 
   return (
@@ -48,6 +68,12 @@ const Import: React.FC = () => {
           {!!uploadedFiles.length && <FileList files={uploadedFiles} />}
 
           <Footer>
+            {!!errorMessage && (
+              <p>
+                <img src={alert} alt="Alert" />
+                {errorMessage}
+              </p>
+            )}
             <p>
               <img src={alert} alt="Alert" />
               Permitido apenas arquivos CSV

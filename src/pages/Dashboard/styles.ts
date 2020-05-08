@@ -28,6 +28,11 @@ export const Card = styled.div`
   padding: 22px 32px;
   border-radius: 5px;
   color: ${({ total }: CardProps): string => (total ? '#fff' : '#363F5F')};
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-8px);
+  }
 
   header {
     display: flex;
